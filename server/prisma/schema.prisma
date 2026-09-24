@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
+
+model Ticket {
+  id            Int          @id @default(autoincrement())
+  ticketId      String       @unique
+  customerName  String
+  customerEmail String
+  subject       String
+  description   String
+  status        TicketStatus @default(OPEN)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  notes         Note[]
+
+  @@index([status])
+  @@index([customerEmail])
+}
+
+model Note {
+  id        Int      @id @default(autoincrement())
+  ticketId  Int
+  noteText  String
+  createdAt DateTime @default(now())
+
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+}
